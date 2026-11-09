@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#e6eef6">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="theme-color" content="#3a3a3c" id="themeColor">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="goal-build" content="16-settings-focus">
+<meta name="goal-build" content="22-round-tab">
 <title>Goal Calendar</title>
 <style>
   :root {
-    --bg: #e6eef6;
+    --bg: #3a3a3c;
     --card: #171717;
     --ink: #fff;
     --line: rgba(255, 255, 255, 0.88);
@@ -88,11 +88,10 @@
     display: flex;
     align-items: flex-end;
     gap: 6px;
-    margin: calc(var(--pad-y) * -1) calc(var(--pad-x) * -1) clamp(8px, 1.4vw, 12px);
-    padding: 8px 8px 0;
-    background: #101010;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.16);
-    border-radius: calc(clamp(18px, 3vw, 28px) - 2px) calc(clamp(18px, 3vw, 28px) - 2px) 0 0;
+    margin: 0 0 10px;
+    padding: 2px 2px 0;
+    background: transparent;
+    border: none;
   }
 
   .tabscroller {
@@ -120,12 +119,11 @@
     flex: 0 0 auto;
     min-width: 84px;
     max-width: 190px;
-    height: 40px;
-    padding: 0 16px 1px;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    border-bottom: none;
-    border-radius: 12px 12px 0 0;
-    background: var(--beige-dim);
+    height: 36px;
+    padding: 0 18px;
+    border: none;
+    border-radius: 12px;
+    background: var(--beige);
     color: #2c261e;
     font-size: clamp(15px, 3.5vw, 18px);
     font-weight: 550;
@@ -136,11 +134,10 @@
   }
 
   .tab.on {
-    height: 44px;
+    height: 36px;
     background: var(--beige);
     color: #2c261e;
-    border-color: rgba(0, 0, 0, 0.08);
-    margin-bottom: -1px;
+    margin-bottom: 0;
     z-index: 1;
   }
 
@@ -206,14 +203,12 @@
     justify-self: center;
     display: grid;
     place-items: center;
-    width: min(100%, 380px);
-    max-width: 100%;
-    min-width: 0;
-    min-height: clamp(44px, 6.4vw, 68px);
-    padding: 2px 16px 3px;
+    width: 92px;
+    height: 40px;
+    padding: 0 8px;
     border: 2px solid #fff;
-    border-radius: 16px;
-    font-size: clamp(20px, 4.4vw, 40px);
+    border-radius: 12px;
+    font-size: 22px;
     font-weight: 500;
     letter-spacing: 0.01em;
     line-height: 1;
@@ -243,16 +238,16 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 16px;
+    gap: 8px;
   }
 
   .select-dots[hidden] { display: none; }
 
   .select-dot {
-    width: 26px;
-    height: 26px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
-    border: 2px solid rgba(0, 0, 0, 0.28);
+    border: 1.5px solid rgba(0, 0, 0, 0.28);
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
   }
 
@@ -622,11 +617,11 @@
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(3, minmax(0, 1fr));
     height: 100%;
-    border-top: 1px solid rgba(255, 255, 255, 0.72);
-    border-left: 1px solid rgba(255, 255, 255, 0.72);
   }
 
-  .year-block + .year-block { border-top: none; }
+  .year-block + .year-block {
+    border-top: 1px solid rgba(255, 255, 255, 0.72);
+  }
 
   .month-cell {
     display: grid;
@@ -641,6 +636,9 @@
     background: transparent;
     transition: transform 0.08s ease, filter 0.08s ease, background 0.12s ease;
   }
+
+  .month-cell:nth-child(4n) { border-right: none; }
+  .month-cell:nth-child(n + 9) { border-bottom: none; }
 
   .month-cell.dim { color: rgba(255, 255, 255, 0.38); }
 
@@ -933,11 +931,6 @@
 
   .goal-edit svg { width: 26px; height: 26px; display: block; }
   .goal-edit:active { transform: scale(0.94); }
-  .goal-edit.on {
-    background: var(--yellow);
-    border-color: var(--yellow);
-    color: #1a1a1a;
-  }
 
   .goal-current {
     margin: 0;
@@ -963,10 +956,11 @@
   .settings-head h2 { display: none; }
 
   .settings-card.mode-name .goal-row { display: none; }
+  .settings-card.mode-name #nameLabel { display: block; }
 
   .settings-card.mode-goal .profile-row { display: none; }
   .settings-card.mode-goal .goal-current { display: none; }
-  .settings-card.mode-goal .settings-head h2 { display: block; }
+  .settings-card.mode-goal #goalLabel { display: block; }
   .settings-card.mode-goal .goal-row {
     flex-direction: column;
     align-items: stretch;
@@ -1035,24 +1029,37 @@
     font-weight: 700;
   }
 
-  .wheel-confirm {
+  .head-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex: 0 0 auto;
+  }
+
+  .wheel-confirm,
+  .name-confirm {
     display: none;
-    width: 54px;
-    height: 54px;
-    margin: 2px auto 16px;
+    width: 40px;
+    height: 40px;
+    margin: 0;
     place-items: center;
     border-radius: 50%;
     background: var(--yellow);
     color: #1a1a1a;
+    flex: 0 0 auto;
   }
 
-  .wheel-confirm.show {
+  .wheel-confirm.show,
+  .settings-card.mode-name .name-confirm {
     display: grid;
     animation: pop 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
-  .wheel-confirm svg { width: 32px; height: 32px; display: block; }
-  .wheel-confirm:active { transform: scale(0.92); }
+  .wheel-confirm svg,
+  .name-confirm svg { width: 24px; height: 24px; display: block; }
+  .wheel-confirm:active,
+  .name-confirm:active { transform: scale(0.92); }
 
   .settings {
     position: absolute;
@@ -1068,7 +1075,13 @@
   .settings.open {
     display: grid;
     background: #000;
-    padding-top: 84px;
+    padding: 12px;
+  }
+
+  .settings.open.above-keys {
+    place-items: start center;
+    padding-top: var(--lift-pad, 140px);
+    padding-bottom: 12px;
   }
 
   .app.settings-on {
@@ -1078,15 +1091,30 @@
   }
 
   body:has(.app.settings-on) { background: #000; }
+  body.above-keys { place-items: start center; }
 
-  .app.settings-on .topbar {
-    position: relative;
-    z-index: 40;
-    pointer-events: none;
+  .portrait-lock {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    background: #3a3a3c;
+    color: #fff;
+    place-items: center;
+    text-align: center;
+    padding: 28px;
+    font-size: 22px;
+    font-weight: 650;
   }
 
-  .app.settings-on #gear { pointer-events: auto; }
+  .portrait-lock p { margin: 0; max-width: 16em; }
 
+  @media (orientation: landscape) and (max-height: 520px) {
+    .portrait-lock { display: grid; }
+    .app { visibility: hidden; }
+  }
+
+  .app.settings-on #gear,
   .app.settings-on .select-btn,
   .app.settings-on .top-actions { visibility: hidden; }
 
@@ -1106,15 +1134,28 @@
 
   .settings-head {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     gap: 8px;
     padding: 14px 8px 8px 16px;
     flex: 0 0 auto;
   }
 
+  .settings-gear {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    color: #fff;
+  }
+
+  .settings-gear svg { width: 24px; height: 24px; display: block; }
+  .settings-gear:active { transform: scale(0.92); }
+
   .settings-head h2 {
     margin: 0;
+    flex: 1 1 auto;
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1145,11 +1186,6 @@
 
   .profile-btn svg { width: 26px; height: 26px; display: block; }
   .profile-btn:active { transform: scale(0.94); }
-  .profile-btn.on {
-    background: var(--yellow);
-    border-color: var(--yellow);
-    color: #1a1a1a;
-  }
 
   .profile-name {
     flex: 1 1 auto;
@@ -1160,7 +1196,7 @@
     border: 1.5px solid rgba(255, 255, 255, 0.28);
     background: rgba(255, 255, 255, 0.06);
     color: #fff;
-    caret-color: var(--yellow);
+    caret-color: #fff;
     font: inherit;
     font-size: 18px;
     font-weight: 650;
@@ -1176,12 +1212,13 @@
 
   .profile-name:focus {
     outline: none;
-    border-color: var(--yellow);
+    border-color: rgba(255, 255, 255, 0.72);
   }
 
   .sheet-x {
     width: 40px;
     height: 40px;
+    margin-left: 0;
     display: grid;
     place-items: center;
     color: rgba(255, 255, 255, 0.92);
@@ -1270,29 +1307,21 @@
     .topbar { gap: 6px; }
     .icon-btn { width: 44px; height: 44px; }
     .icon-btn svg { width: 26px; height: 26px; }
-    .select-btn {
-      width: 100%;
-      min-height: 42px;
-      padding: 2px 10px 3px;
-      border-radius: 14px;
-      font-size: 20px;
-    }
-    .tab { min-width: 76px; height: 38px; }
-    .tab.on { height: 42px; }
+    .select-btn { width: 92px; height: 40px; font-size: 22px; }
+    .tab, .tab.on { min-width: 76px; height: 34px; }
   }
 
   @media (max-height: 560px) {
     .app { --pad-y: 6px; --pad-x: 8px; padding: 6px 8px; }
-    .tabstrip { padding-top: 4px; margin-bottom: 4px; }
-    .tab { height: 30px; min-width: 68px; font-size: 14px; padding: 0 12px; }
-    .tab.on { height: 34px; }
+    .tabstrip { padding-top: 2px; margin-bottom: 6px; }
+    .tab, .tab.on { height: 32px; min-width: 68px; font-size: 14px; padding: 0 14px; }
     .tab-add { width: 32px; height: 32px; margin-bottom: 0; }
     .tab-add svg { width: 18px; height: 18px; }
     .float-go { width: 44px; height: 44px; }
     .float-go svg { width: 26px; height: 26px; }
     .topbar { margin-bottom: 4px; }
     .icon-btn { width: 40px; height: 40px; }
-    .select-btn { min-height: 40px; font-size: 18px; border-radius: 12px; width: 100%; padding: 2px 8px 3px; }
+    .select-btn { width: 92px; height: 40px; font-size: 22px; }
     .month-head { margin-bottom: 2px; }
     .month-btn { font-size: 20px; padding: 2px 8px 3px; }
     .panel { padding: 6px 8px 4px; }
@@ -1427,16 +1456,31 @@
     <div class="settings" id="settings">
       <div class="settings-card" role="dialog" aria-modal="true" aria-label="Settings">
         <div class="settings-head">
-          <h2 id="goalLabel">Select your goal</h2>
-          <button type="button" class="sheet-x" id="settingsX" aria-label="Close">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6 L18 18 M18 6 L6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <button type="button" class="settings-gear" id="settingsGear" aria-label="Settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
           </button>
+          <h2 id="goalLabel">Select your goal</h2>
+          <h2 id="nameLabel">Your name</h2>
+          <div class="head-actions">
+            <button type="button" class="wheel-confirm" id="wheelConfirm" aria-label="Confirm" disabled>
+              <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M14.2 25.6c2.6 2.7 5.2 5.8 7.2 7.6C26 27 31.4 19.8 36.2 15.6" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button type="button" class="name-confirm" id="nameConfirm" aria-label="Confirm">
+              <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M14.2 25.6c2.6 2.7 5.2 5.8 7.2 7.6C26 27 31.4 19.8 36.2 15.6" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button type="button" class="sheet-x" id="settingsX" aria-label="Close">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6 L18 18 M18 6 L6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </button>
+          </div>
         </div>
         <div class="profile-row">
           <button type="button" class="profile-btn" id="profileBtn" aria-label="Edit name" aria-pressed="false">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 19.2c1.2-3 3.4-4.5 6.5-4.5s5.3 1.5 6.5 4.5"/></svg>
           </button>
-          <input id="profileName" class="profile-name" type="text" maxlength="10" placeholder="Name" autocomplete="off" disabled aria-label="Name">
+          <input id="profileName" class="profile-name" type="text" maxlength="10" placeholder="Name" autocomplete="off" enterkeyhint="done" disabled aria-label="Name">
         </div>
         <div class="goal-row">
           <button type="button" class="goal-edit" id="goalEdit" aria-label="Edit goal" aria-pressed="false">
@@ -1451,9 +1495,6 @@
             </div>
           </div>
         </div>
-        <button type="button" class="wheel-confirm" id="wheelConfirm" aria-label="Confirm" disabled>
-          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M14.2 25.6c2.6 2.7 5.2 5.8 7.2 7.6C26 27 31.4 19.8 36.2 15.6" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
       </div>
     </div>
 
@@ -1467,13 +1508,15 @@
       </div>
     </div>
   </main>
+  <div class="portrait-lock" id="portraitLock">
+    <p>Turn your phone upright</p>
+  </div>
 
 <script>
 (function () {
   var KEY = 'goalCalendar.v2';
   var OLD_KEY = 'goalCalendar.v1';
   var MAX_TABS = 2;
-  var CYCLE = ['empty', 'no', 'yes'];
   var PICK_ARROW = '<svg viewBox="0 0 24 24"><path d="M6 12h11M13 7l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   var STAR_ICON = '<span class="goal-star" aria-hidden="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.1l2.7 6.3 6.8.6-5.2 4.4 1.6 6.6L12 16.7 6.1 20l1.6-6.6-5.2-4.4 6.8-.6z"/></svg></span>';
   var GOALS = [
@@ -1534,7 +1577,10 @@
 
   var store = loadStore();
   var marks = store.tabs[store.active].marks;
-  var cursor = { y: store.tabs[store.active].y, m: store.tabs[store.active].m };
+  var openedOn = new Date();
+  var cursor = { y: openedOn.getFullYear(), m: openedOn.getMonth() };
+  store.tabs[store.active].y = cursor.y;
+  store.tabs[store.active].m = cursor.m;
   var yearMode = false;
   var visibleYear = cursor.y;
   var YEAR_MIN = 2025;
@@ -2393,6 +2439,12 @@
     return false;
   }
 
+  function dropEdit() {
+    if (!historyEdit) return;
+    if (overlay.classList.contains('open')) closePicker();
+    finishHistory(false);
+  }
+
   function syncHistory() {
     historyBtn.classList.toggle('editing', historyEdit);
     historyBtn.setAttribute('aria-pressed', historyEdit ? 'true' : 'false');
@@ -2404,6 +2456,75 @@
   var profileName = document.getElementById('profileName');
   var goalCurrent = document.getElementById('goalCurrent');
   var profileEditing = false;
+  var nameLift = false;
+  var settingsLiftTimer = null;
+
+  function isPhone() {
+    return window.matchMedia('(max-width: 900px)').matches;
+  }
+
+  var keyboardBar = 0;
+
+  function keyboardInset() {
+    var fromVv = 0;
+    var vv = window.visualViewport;
+    if (vv) fromVv = Math.max(0, window.innerHeight - vv.height);
+    return Math.max(fromVv, keyboardBar);
+  }
+
+  function clearSettingsLift() {
+    settings.classList.remove('above-keys');
+    document.body.classList.remove('above-keys');
+    settings.style.paddingTop = '';
+    app.style.height = '';
+    app.style.transform = '';
+  }
+
+  function placeSettings() {
+    var open = settings.classList.contains('open');
+    var inset = keyboardInset();
+    var lift = open && (nameLift || inset > 80);
+    if (!lift || !window.visualViewport) {
+      clearSettingsLift();
+      return;
+    }
+    var vv = window.visualViewport;
+    var visH = vv.height;
+    var room = window.innerHeight - vv.offsetTop - inset;
+    if (room > 80 && room < visH - 8) visH = room;
+    settings.classList.add('above-keys');
+    document.body.classList.add('above-keys');
+    var pad = Math.round(Math.min(visH * 0.24, 168));
+    var maxPad = visH - 220;
+    if (maxPad < 28) pad = Math.max(12, maxPad);
+    else if (pad > maxPad) pad = maxPad;
+    else if (pad < 96) pad = Math.min(96, maxPad);
+    settings.style.paddingTop = pad + 'px';
+    app.style.height = visH + 'px';
+    app.style.transform = vv.offsetTop ? ('translateY(' + vv.offsetTop + 'px)') : '';
+    if (profileEditing) {
+      var card = settings.querySelector('.settings-card');
+      var field = profileName.getBoundingClientRect();
+      var box = card.getBoundingClientRect();
+      if (field.bottom > box.bottom - 8) card.scrollTop += field.bottom - box.bottom + 16;
+    }
+  }
+
+  function scheduleSettingsLift() {
+    clearTimeout(settingsLiftTimer);
+    var ticks = 0;
+    function tick() {
+      placeSettings();
+      ticks++;
+      if (ticks < 8 && (nameLift || keyboardInset() > 80)) settingsLiftTimer = setTimeout(tick, 70);
+    }
+    settingsLiftTimer = setTimeout(tick, 40);
+  }
+
+  function paintTheme() {
+    var meta = document.getElementById('themeColor');
+    if (meta) meta.setAttribute('content', app.classList.contains('settings-on') ? '#000000' : '#3a3a3c');
+  }
 
   function fillProfile() {
     var tab = store.tabs[store.active];
@@ -2412,6 +2533,7 @@
 
   function armProfile(on) {
     profileEditing = on;
+    nameLift = !!on && isPhone();
     profileName.disabled = !on;
     profileBtn.classList.toggle('on', on);
     profileBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
@@ -2421,6 +2543,8 @@
       profileName.select();
     }
     syncSettingsMode();
+    placeSettings();
+    if (on) scheduleSettingsLift();
   }
 
   function commitProfile() {
@@ -2439,6 +2563,8 @@
     saveStore();
     renderTabs();
     syncSettingsMode();
+    nameLift = false;
+    placeSettings();
   }
 
   function openSettings() {
@@ -2451,6 +2577,8 @@
     gearBtn.setAttribute('aria-expanded', 'true');
     armWheel(savedGoalIndex());
     placeFloat();
+    paintTheme();
+    placeSettings();
   }
 
   function closeSettings() {
@@ -2462,8 +2590,12 @@
     syncGoalEdit();
     settings.classList.remove('open');
     app.classList.remove('settings-on');
+    nameLift = false;
+    clearTimeout(settingsLiftTimer);
     gearBtn.setAttribute('aria-expanded', 'false');
     placeFloat();
+    paintTheme();
+    placeSettings();
   }
 
   function hasPending() {
@@ -2507,9 +2639,8 @@
   }
 
   function nextColor(current) {
-    var i = CYCLE.indexOf(current);
-    if (i < 0) i = 0;
-    return CYCLE[(i + 1) % CYCLE.length];
+    if (current === 'yes' || current === 'no') return 'empty';
+    return 'yes';
   }
 
   function paintCell(isoKey) {
@@ -2851,6 +2982,8 @@
   });
 
   monthBtn.addEventListener('click', function () {
+    if (historyAsk.classList.contains('open')) return;
+    dropEdit();
     setYearMode(!yearMode);
   });
 
@@ -2952,16 +3085,32 @@
   document.getElementById('tabs').addEventListener('click', function (e) {
     var btn = e.target.closest('.tab');
     if (!btn) return;
+    if (historyAsk.classList.contains('open')) return;
+    dropEdit();
     selectTab(btn.getAttribute('data-tab'));
   });
 
   gearBtn.addEventListener('click', function () {
-    if (overlay.classList.contains('open') || historyAsk.classList.contains('open')) return;
+    if (historyAsk.classList.contains('open')) return;
+    if (!settings.classList.contains('open')) dropEdit();
     if (settings.classList.contains('open')) closeSettings();
     else openSettings();
   });
 
+  document.getElementById('settingsGear').addEventListener('click', closeSettings);
   document.getElementById('settingsX').addEventListener('click', closeSettings);
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', placeSettings);
+    window.visualViewport.addEventListener('scroll', placeSettings);
+  }
+  if (navigator.virtualKeyboard && navigator.virtualKeyboard.addEventListener) {
+    navigator.virtualKeyboard.addEventListener('geometrychange', function (e) {
+      var rect = (e && e.target && e.target.boundingRect) || navigator.virtualKeyboard.boundingRect;
+      keyboardBar = rect && rect.height ? rect.height : 0;
+      placeSettings();
+    });
+  }
 
   profileBtn.addEventListener('click', function () {
     if (goalEditing) armWheel(savedGoalIndex());
@@ -3000,6 +3149,9 @@
   });
 
   wheelConfirm.addEventListener('click', confirmWheel);
+  document.getElementById('nameConfirm').addEventListener('click', function () {
+    if (profileEditing) commitProfile();
+  });
 
   wheelList.addEventListener('scroll', onWheelScroll);
 
@@ -3092,6 +3244,13 @@
       watchToday();
     }, Math.max(1000, next - now));
   }
+
+  function lockPortrait() {
+    if (!window.matchMedia('(pointer: coarse), (max-width: 900px)').matches) return;
+    if (!screen.orientation || !screen.orientation.lock) return;
+    screen.orientation.lock('portrait').catch(function () {});
+  }
+  document.addEventListener('pointerdown', lockPortrait, { once: true });
 
   document.addEventListener('gesturestart', function (e) { e.preventDefault(); }, { passive: false });
   document.addEventListener('gesturechange', function (e) { e.preventDefault(); }, { passive: false });
